@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cummins College Library</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav id="navbar">
+  <div class="nav-logo">📚 LibraryMS</div>
+  <ul class="nav-links">
+    <li><a href="#home" class="nav-link active">Home</a></li>
+    <li><a href="#books" class="nav-link">Books</a></li>
+    <li><a href="#dashboard" class="nav-link">My Books</a></li>
+    <li><a href="#admin" class="nav-link">Admin</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="nav-user-info" class="nav-user hidden"></span>
+    <button id="logout-btn" class="btn-outline hidden" onclick="logout()">Logout</button>
+    <button class="btn-primary" onclick="showSection('login')">Login</button>
+  </div>
+</nav>
+
+<!-- ===== LOGIN PAGE ===== -->
+<section id="login" class="page active">
+  <div class="login-container">
+    <div class="login-brand">
+      <div class="brand-icon">📚</div>
+      <h1>Cummins College<br/><span>Library System</span></h1>
+      <p>Access books, track dues, and manage your reading journey.</p>
+    </div>
+    <div class="login-form-wrap">
+      <h2>Welcome Back</h2>
+      <p class="sub">Sign in to your account</p>
+      <div class="tab-switch">
+        <button class="tab-btn active" onclick="switchRole('student')">Student</button>
+        <button class="tab-btn" onclick="switchRole('admin')">Librarian</button>
+      </div>
+      <div class="form-group">
+        <label>PRN / Email</label>
+        <input type="text" id="login-id" placeholder="Enter your PRN or email"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="Enter password"/>
+      </div>
+      <div class="login-hint" id="login-hint">
+        Demo: <b>student1 / pass123</b> &nbsp;|&nbsp; Admin: <b>admin / admin123</b>
+      </div>
+      <button class="btn-primary full" onclick="handleLogin()">Sign In</button>
+      <p id="login-error" class="error-msg hidden">Invalid credentials. Please try again.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOME PAGE ===== -->
+<section id="home" class="page hidden">
+  <div class="hero">
+    <div class="hero-text">
+      <p class="hero-tag">Cummins College of Engineering</p>
+      <h1>Your Smart<br/><em>Library Portal</em></h1>
+      <p class="hero-sub">Search, borrow, and track books — all in one place. Never pay a fine again.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showSection('books')">Browse Books</button>
+        <button class="btn-outline" onclick="showSection('dashboard')">My Dashboard</button>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card"><span class="stat-num">1,240</span><span class="stat-label">Total Books</span></div>
+      <div class="stat-card"><span class="stat-num">312</span><span class="stat-label">Available Now</span></div>
+      <div class="stat-card"><span class="stat-num">85</span><span class="stat-label">New Arrivals</span></div>
+      <div class="stat-card"><span class="stat-num">428</span><span class="stat-label">Students Enrolled</span></div>
+    </div>
+  </div>
+
+  <!-- Notifications / Alerts -->
+  <div class="section-block" id="alerts-block" style="display:none">
+    <h2 class="section-title">⚠️ Alerts</h2>
+    <div id="alerts-container"></div>
+  </div>
+
+  <!-- Featured / New Arrivals -->
+  <div class="section-block">
+    <h2 class="section-title">📖 New Arrivals</h2>
+    <div class="books-grid" id="new-arrivals-grid"></div>
+  </div>
+</section>
+
+<!-- ===== BOOKS PAGE ===== -->
+<section id="books" class="page hidden">
+  <div class="page-header">
+    <h1>Book Catalogue</h1>
+    <p>Search across all departments and categories</p>
+  </div>
+  <div class="search-bar-wrap">
+    <input type="text" id="book-search" placeholder="🔍  Search by title, author, or subject..." oninput="filterBooks()"/>
+    <select id="filter-dept" onchange="filterBooks()">
+      <option value="">All Departments</option>
+      <option value="Computer">Computer Engineering</option>
+      <option value="Electronics">Electronics</option>
+      <option value="Mechanical">Mechanical</option>
+      <option value="Mathematics">Mathematics</option>
+      <option value="Physics">Physics</option>
+    </select>
+    <select id="filter-status" onchange="filterBooks()">
+      <option value="">All Status</option>
+      <option value="available">Available</option>
+      <option value="issued">Issued</option>
+    </select>
+  </div>
+  <div class="books-grid" id="books-grid"></div>
+</section>
+
+<!-- ===== DASHBOARD PAGE ===== -->
+<section id="dashboard" class="page hidden">
+  <div class="page-header">
+    <h1>My Dashboard</h1>
+    <p id="dash-welcome">Track your issued books and dues</p>
+  </div>
+
+  <div class="dash-summary" id="dash-summary"></div>
+
+  <div class="section-block">
+    <h2 class="section-title">📗 Currently Issued Books</h2>
+    <div id="issued-books-list"></div>
+  </div>
+
+  <div class="section-block">
+    <h2 class="section-title">📜 Borrowing History</h2>
+    <div id="history-list"></div>
+  </div>
+
+  <div class="section-block">
+    <h2 class="section-title">🔖 Reserved Books</h2>
+    <div id="reserved-list"></div>
+  </div>
+</section>
+
+<!-- ===== ADMIN PAGE ===== -->
+<section id="admin" class="page hidden">
+  <div class="page-header">
+    <h1>Admin Panel</h1>
+    <p>Manage books, issues, and returns</p>
+  </div>
+  <div class="admin-tabs">
+    <button class="tab-btn active" onclick="switchAdminTab('all-books')">All Books</button>
+    <button class="tab-btn" onclick="switchAdminTab('add-book')">Add Book</button>
+    <button class="tab-btn" onclick="switchAdminTab('all-issues')">Issued Books</button>
+    <button class="tab-btn" onclick="switchAdminTab('overdue')">Overdue</button>
+  </div>
+
+  <!-- All books tab -->
+  <div id="admin-all-books" class="admin-tab-content">
+    <div class="books-grid" id="admin-books-grid"></div>
+  </div>
+
+  <!-- Add book tab -->
+  <div id="admin-add-book" class="admin-tab-content hidden">
+    <div class="admin-form">
+      <h3>Add New Book</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Title</label><input type="text" id="add-title" placeholder="Book title"/></div>
+        <div class="form-group"><label>Author</label><input type="text" id="add-author" placeholder="Author name"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Department</label>
+          <select id="add-dept">
+            <option>Computer</option><option>Electronics</option><option>Mechanical</option><option>Mathematics</option><option>Physics</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Total Copies</label><input type="number" id="add-copies" value="1" min="1"/></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="add-desc" placeholder="Short description..."></textarea></div>
+      <button class="btn-primary" onclick="addBook()">Add Book</button>
+      <p id="add-success" class="success-msg hidden">✅ Book added successfully!</p>
+    </div>
+  </div>
+
+  <!-- All issues tab -->
+  <div id="admin-all-issues" class="admin-tab-content hidden">
+    <div id="admin-issues-list"></div>
+  </div>
+
+  <!-- Overdue tab -->
+  <div id="admin-overdue" class="admin-tab-content hidden">
+    <div id="admin-overdue-list"></div>
+  </div>
+</section>
+
+<!-- ===== BOOK DETAIL MODAL ===== -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
